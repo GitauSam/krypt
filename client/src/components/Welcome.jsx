@@ -6,6 +6,7 @@ import { BsInfoCircle } from 'react-icons/bs'
 import { TransactionContext } from '../context/TransactionContext'
 import { Loader } from './'
 import { shortenAddress } from '../utils/shortenAddress'
+import Alert from './Alert'
 
 const commonStyles = 'min-h-[70px] sm:px-0 px-2 sm:min-w-[120px] flex justify-center items-center border-[0.5px] border-gray-400 text-sm font-light text-white'
 
@@ -27,7 +28,9 @@ const Welcome = () => {
         currentAccount,
         formData,
         handleChange,
-        sendTransaction
+        sendTransaction,
+        isLoading,
+        isError
     } = useContext(TransactionContext)
 
     const handleSubmit = (e) => {
@@ -46,7 +49,8 @@ const Welcome = () => {
     }
 
     return (
-        <div className="flex w-full justify-center items-center">
+        <div className="flex w-full justify-center items-center relative">
+            {isError && <Alert />}
             <div className="flex mf:flex-row flex-col items-start justify-between md:p-20 py-12 px-4">
                 <div className="flex flex-1 justify-start flex-col mf:mr-10">
                     <h1 className='text-3xl sm:text-5xl text-white text-gradient py-1'>
@@ -137,7 +141,7 @@ const Welcome = () => {
                         />
                     </div>
                     <div className="h-[1px] w-full bg-gray-400 my-2" />
-                    {false ? (
+                    {isLoading ? (
                         <Loader />
                     ) :  (
                         <button

@@ -26,6 +26,9 @@ export const TransactionProvider = ({ children }) => {
         keyword: '',
         message: ''
     })
+    const [transactions, setTransactions] = useState([])
+    const [isError, setIsError] = useState(false)
+    const [errorMessage, setErrorMessage] = useState('')
 
     const handleChange = (e, name) => {
         setFormData((prevState) => ({
@@ -33,22 +36,68 @@ export const TransactionProvider = ({ children }) => {
         }))
     }
 
+    const alertError = (message) => {
+        setErrorMessage(message)
+        setIsError(true)
+    }
+
+    const getAllTransactions = async() => {
+        try {
+            if (ethereum) {
+                const transactionsContract = getEthereumContract()
+
+                const availableTransactions = await transactionsContract.getAllTransactions()
+
+                const structuredTransactions = availableTransactions.map(
+                    (transaction) => ({
+                        addressTo: transaction.receiver,
+                        addressFrom: transaction.sender,
+                        timestamp: new Date(transaction.timestamp.toNumber() * 1000).toLocaleString(),
+                        message:transaction.message,
+                        keyword: transaction.keyword,
+                        amount: parseInt(transaction.amount._hex) / (10**18)
+                    })
+                )
+
+                setTransactions(structuredTransactions)
+            } else {
+                alertError("Ethereum is not present")
+            }
+        } catch (error) {
+            alertError("Ethereum is not present")
+        }
+    }
+
     const checkIfWalletIsConnected = async () => {
         try {
-            if (!ethereum) return alert("Please install Metamask")
+            if (!ethereum) {
+                alertError("Please install Metamask")
+                return
+            }
 
             const accounts = await ethereum.request({ method: 'eth_accounts' })
 
             if (accounts.length) {
                 setCurrentAccount(accounts[0])
 
-                // getAllTransactions()
+                getAllTransactions()
             } else {
-                console.log('No accounts found.')
+                alertError('No accounts found')
             }
         } catch(error) {
-            console.log(error)
+            alertError("No ethereum object")
+            throw new Error("No ethereum object.")
+        }
+    }
 
+    const checkIfTransactionsExist = async () => {
+        try {
+            const transactionContract = new ethers.Contract(contractAddress, contractABI, signer)
+            const transactionCount = await transactionContract.getTransactionsCount()
+
+            window.localStorage.setItem("transactionCount", transactionCount)
+        } catch (error) {
+            alertError("No ethereum object")
             throw new Error("No ethereum object.")
         }
     }
@@ -61,8 +110,7 @@ export const TransactionProvider = ({ children }) => {
 
             setCurrentAccount(accounts[0])
         } catch (error) {
-            console.log(error)
-
+            alertError("No ethereum object")
             throw new Error("No ethereum object.")
         }
     }
@@ -98,24 +146,23 @@ export const TransactionProvider = ({ children }) => {
             )
 
             setIsLoading(true)
-            console.log(`loading: ${transactionHash.hash}`)
             await transactionHash.wait()
 
             setIsLoading(false)
-            console.log(`success: ${transactionHash.hash}`)
 
             const transactionCount = await transactionContract.getTransactionsCount()
             setTransactionCount(transactionCount.toNumber())
+            window.location.reload()
 
         } catch (error) {
-            console.log(error)
-
+            alertError("No ethereum object")
             throw new Error("No ethereum object.")
         }
     }
 
     useEffect(() => {
         checkIfWalletIsConnected()
+        checkIfTransactionsExist()
     }, [])
 
     return (
@@ -126,7 +173,12 @@ export const TransactionProvider = ({ children }) => {
                 formData,
                 setFormData,
                 handleChange,
-                sendTransaction
+                sendTransaction,
+                transactions,
+                isLoading,
+                isError,
+                errorMessage,
+                setIsError
             }}
         >
             {children}
