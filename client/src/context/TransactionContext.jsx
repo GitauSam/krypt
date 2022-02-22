@@ -85,7 +85,6 @@ export const TransactionProvider = ({ children }) => {
                 alertError('No accounts found')
             }
         } catch(error) {
-            alertError("No ethereum object")
             throw new Error("No ethereum object.")
         }
     }
@@ -97,14 +96,13 @@ export const TransactionProvider = ({ children }) => {
 
             window.localStorage.setItem("transactionCount", transactionCount)
         } catch (error) {
-            alertError("No ethereum object")
             throw new Error("No ethereum object.")
         }
     }
 
     const connectWallet = async () => {
         try {
-            if(!ethereum) return alert("Please install Metamask")
+            if(!ethereum) return alertError("Please install Metamask")
 
             const accounts = await ethereum.request({ method: 'eth_requestAccounts' })
 
