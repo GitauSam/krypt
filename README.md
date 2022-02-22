@@ -18,6 +18,6 @@ Access the site by clicking this link: https://krypt.cf
 
 ### Screenshots
 
-![image] (https://user-images.githubusercontent.com/18342993/155108287-074b6e7d-f9f5-410f-b071-f208964fcdd6.png)
+![image](https://user-images.githubusercontent.com/18342993/155108287-074b6e7d-f9f5-410f-b071-f208964fcdd6.png)
 
-![image] (https://user-images.githubusercontent.com/18342993/155108760-4e8cbefb-6b15-4374-ab06-18be567a529b.png)
+![image](https://user-images.githubusercontent.com/18342993/155108760-4e8cbefb-6b15-4374-ab06-18be567a529b.png)
