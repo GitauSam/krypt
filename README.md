@@ -1,7 +1,7 @@
 # krypt
 
 Simple Web3 application that allows one to send ethereum through the ropsten test network.
-Access the site by clicking this link: http://krypt.cf
+Access the site by clicking this link: https://krypt.cf
 
 ## Prerequisites
 
